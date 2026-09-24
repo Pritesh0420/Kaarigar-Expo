@@ -308,7 +308,7 @@ After deploying, remember to:
 
 ### 🌐 Live Demo
 
-> 🚀 **[https://kaarigar-expo.vercel.app](https://kaarigar-expo-idy0i9i6t-prits2.vercel.app/)**
+> 🚀 **[https://kaarigar-expo.vercel.app](https://kaarigar-expo.vercel.app/)**
 
 **Quick demo credentials:**
 
