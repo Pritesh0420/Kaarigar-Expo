@@ -23,7 +23,7 @@ service cloud.firestore {
     match /events/{eventId} {
       // Anyone can read events
       allow read: if true;
-      // Only admins can create/update events
+      // Only admins can create, update, or delete events
       allow write: if isAdmin();
     }
     

@@ -17,6 +17,7 @@ export interface UserProfile {
   craftType?: string;
   bio?: string;
   photoUrl?: string;
+  interests?: string;
 }
 
 interface AuthContextType {

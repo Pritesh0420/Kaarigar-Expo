@@ -21,6 +21,7 @@ import {
   X,
   ExternalLink,
   Award,
+  Image as ImageIcon,
 } from "lucide-react";
 
 export default function KaarigarDashboard() {
@@ -31,7 +32,7 @@ export default function KaarigarDashboard() {
   const [loading, setLoading] = useState(true);
 
   const [isEditing, setIsEditing] = useState(false);
-  const [profile, setProfile] = useState({ phone: "", craftType: "", bio: "" });
+  const [profile, setProfile] = useState({ phone: "", craftType: "", bio: "", photoUrl: "" });
 
   useEffect(() => {
     if (!authLoading && (!userProfile || userProfile.role !== "kaarigar")) {
@@ -42,6 +43,7 @@ export default function KaarigarDashboard() {
         phone: userProfile.phone || "",
         craftType: userProfile.craftType || "",
         bio: userProfile.bio || "",
+        photoUrl: userProfile.photoUrl || "",
       });
     }
   }, [authLoading, userProfile, router]);
@@ -72,6 +74,21 @@ export default function KaarigarDashboard() {
       setIsEditing(false);
     } catch {
       toast.error("Failed to update profile");
+    }
+  };
+
+  const handlePhotoUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      if (file.size > 2 * 1024 * 1024) {
+        toast.error("Image must be less than 2MB");
+        return;
+      }
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        setProfile({ ...profile, photoUrl: reader.result as string });
+      };
+      reader.readAsDataURL(file);
     }
   };
 
@@ -194,6 +211,35 @@ export default function KaarigarDashboard() {
                         onChange={(e) => setProfile({ ...profile, bio: e.target.value })}
                         placeholder="Tell the world about your craft..."
                       />
+                    </div>
+                    <div>
+                      <label className="flex items-center gap-1.5 text-xs font-bold text-[#6B4C3B] uppercase tracking-wider mb-2">
+                        <ImageIcon className="w-3.5 h-3.5" /> Profile / Banner Photo
+                      </label>
+                      <div className="relative border-2 border-dashed border-[#C4A882] rounded-xl p-6 flex flex-col items-center justify-center text-center bg-[#FDF0E8] hover:bg-[#FCE5D3] transition-colors cursor-pointer group overflow-hidden">
+                        <input
+                          type="file"
+                          accept="image/*"
+                          onChange={handlePhotoUpload}
+                          className="absolute inset-0 w-full h-full opacity-0 cursor-pointer z-10"
+                        />
+                        {profile.photoUrl ? (
+                          <div className="relative w-full h-32 rounded-lg overflow-hidden">
+                            <img src={profile.photoUrl} alt="Preview" className="w-full h-full object-cover" />
+                            <div className="absolute inset-0 bg-black/40 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
+                              <span className="text-white text-xs font-bold bg-[#3D2B1F]/80 px-3 py-1.5 rounded-full">Change Photo</span>
+                            </div>
+                          </div>
+                        ) : (
+                          <>
+                            <div className="w-12 h-12 bg-white rounded-full flex items-center justify-center shadow-sm mb-3 text-[#C4602A]">
+                              <ImageIcon className="w-5 h-5" />
+                            </div>
+                            <p className="text-[#3D2B1F] text-sm font-bold mb-1">Upload Photo</p>
+                            <p className="text-[#9C7B6A] text-xs">PNG, JPG up to 2MB</p>
+                          </>
+                        )}
+                      </div>
                     </div>
                     <div className="flex gap-2 pt-1">
                       <button type="submit" className="flex-1 bg-[#C4602A] hover:bg-[#9E4B1F] text-white py-2.5 rounded-xl font-semibold text-sm transition-colors">

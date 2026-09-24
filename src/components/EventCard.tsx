@@ -30,12 +30,22 @@ export default function EventCard({ event }: { event: EventType }) {
 
   const statusClass = statusColors[event.status] || statusColors.upcoming;
 
+  // Since remote Firebase rules block updating the seeded mock data, we override the mock banner URLs here
+  const updatedBanners: Record<string, string> = {
+    "event-1": "https://images.unsplash.com/photo-1605292356183-a77d0a9c9d1d?w=1200&auto=format&fit=crop",
+    "event-2": "https://images.unsplash.com/photo-1590605095243-072811dbe64c?w=1200&auto=format&fit=crop",
+    "event-3": "https://images.unsplash.com/photo-1616706161242-f1d591350d1c?w=1200&auto=format&fit=crop",
+    "event-4": "https://images.unsplash.com/photo-1640292343595-889db1c8262e?w=1200&auto=format&fit=crop",
+    "event-5": "https://images.unsplash.com/photo-1603030002297-85e206a2285a?w=1200&auto=format&fit=crop",
+  };
+  const banner = updatedBanners[event.id] || event.bannerUrl;
+
   return (
     <div className="bg-white rounded-2xl shadow-sm border border-[#EAE0CF] overflow-hidden hover:shadow-lg transition-all duration-300 group flex flex-col">
       {/* Banner */}
       <div className="h-52 overflow-hidden bg-[#EAE0CF] relative">
         <img
-          src={event.bannerUrl}
+          src={banner}
           alt={event.title}
           onError={(e) => { e.currentTarget.src = `https://picsum.photos/seed/${event.id}/800/400`; }}
           className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"

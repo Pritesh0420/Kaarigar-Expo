@@ -1,5 +1,26 @@
+import type { Metadata } from "next";
 import Link from "next/link";
 import { Heart, Globe, ShieldCheck, ArrowRight } from "lucide-react";
+
+export const metadata: Metadata = {
+  title: "About Us",
+  description:
+    "Learn about Kaarigar Expo's mission to empower India's traditional craftspeople. We bridge master artisans with visitors through transparent digital event management.",
+  openGraph: {
+    title: "About Kaarigar Expo – Empowering India's Artisans",
+    description:
+      "Our mission is to give every Indian artisan a dignified channel to participate in handicraft melas and cultural exhibitions across India.",
+    images: [
+      {
+        url: "https://images.unsplash.com/photo-1590605095243-072811dbe64c?w=1200&auto=format&fit=crop",
+        width: 1200,
+        height: 630,
+        alt: "Indian craftsperson at work",
+      },
+    ],
+  },
+};
+
 
 export default function AboutPage() {
   return (

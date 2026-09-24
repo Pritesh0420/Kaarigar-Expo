@@ -8,7 +8,7 @@ export const seedDatabase = async () => {
       title: "Delhi Diwali Mela 2026",
       description: "A grand exhibition of festive crafts, clay diyas, and traditional handlooms. India's most celebrated seasonal crafts fair returns to Dilli Haat.",
       // Indian handicraft / mela crowd — Unsplash
-      bannerUrl: "https://images.unsplash.com/photo-1578662996442-48f60103fc96?w=1200&auto=format&fit=crop",
+      bannerUrl: "https://images.unsplash.com/photo-1605292356183-a77d0a9c9d1d?w=1200&auto=format&fit=crop",
       locationName: "Dilli Haat, INA",
       city: "New Delhi",
       coordinates: { lat: 28.5728, lng: 77.2085 },
@@ -22,7 +22,7 @@ export const seedDatabase = async () => {
       title: "Jaipur Artisan Fair 2026",
       description: "Showcasing Rajasthan's finest terracotta, blue pottery, bandhani textiles, and mirror-work leathercraft from master Kaarigar families.",
       // Rajasthan pottery / blue pottery
-      bannerUrl: "https://images.unsplash.com/photo-1519638831568-d9897f54ed69?w=1200&auto=format&fit=crop",
+      bannerUrl: "https://images.unsplash.com/photo-1590605095243-072811dbe64c?w=1200&auto=format&fit=crop",
       locationName: "Jawahar Kala Kendra",
       city: "Jaipur",
       coordinates: { lat: 26.8856, lng: 75.8052 },
@@ -36,7 +36,7 @@ export const seedDatabase = async () => {
       title: "Surajkund International Crafts Fair",
       description: "One of Asia's largest handicrafts fairs, celebrating artisans from across 30+ states and international craft traditions.",
       // Indian weaving / textile — Unsplash
-      bannerUrl: "https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=1200&auto=format&fit=crop",
+      bannerUrl: "https://images.unsplash.com/photo-1616706161242-f1d591350d1c?w=1200&auto=format&fit=crop",
       locationName: "Surajkund Mela Grounds",
       city: "Faridabad",
       coordinates: { lat: 28.4783, lng: 77.3157 },
@@ -50,7 +50,7 @@ export const seedDatabase = async () => {
       title: "Bengal Handloom & Terracotta Grand Expo",
       description: "Discover Biswa Bangla's authentic handloom sarees, Bankura horses, Madhubani paintings, and Dokra metal craft from Bengal's finest weavers.",
       // Loom / weaving photo
-      bannerUrl: "https://images.unsplash.com/photo-1600585152220-90363fe7e115?w=1200&auto=format&fit=crop",
+      bannerUrl: "https://images.unsplash.com/photo-1640292343595-889db1c8262e?w=1200&auto=format&fit=crop",
       locationName: "Biswa Bangla Mela Prangan, EM Bypass",
       city: "Kolkata",
       coordinates: { lat: 22.5355, lng: 88.3987 },
@@ -64,7 +64,7 @@ export const seedDatabase = async () => {
       title: "Shilpgram Folk Arts Carnival",
       description: "Udaipur's premier folk arts festival where master craftspeople from Rajasthan, Gujarat, and Madhya Pradesh exhibit puppetry, miniature paintings, and tribal art.",
       // Indian tribal art / folk craft
-      bannerUrl: "https://images.unsplash.com/photo-1583743814966-8936f5b7be1a?w=1200&auto=format&fit=crop",
+      bannerUrl: "https://images.unsplash.com/photo-1603030002297-85e206a2285a?w=1200&auto=format&fit=crop",
       locationName: "Shilpgram Rural Arts Complex, Rani Road",
       city: "Udaipur",
       coordinates: { lat: 24.5819, lng: 73.6625 },

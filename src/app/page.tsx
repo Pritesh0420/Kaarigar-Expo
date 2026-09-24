@@ -1,15 +1,67 @@
 "use client";
 
 import Link from "next/link";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { collection, getDocs, limit, query, where } from "firebase/firestore";
 import { db } from "@/lib/firebase";
 import EventCard, { EventType } from "@/components/EventCard";
 import { ArrowRight, Star, Heart, Map, ShieldCheck, ChevronRight, ChevronLeft } from "lucide-react";
 
+const heroSlides = [
+  {
+    title: "Heritage Weaves & Handloom",
+    desc: "Authentic artisan textiles from across India",
+    image: "https://images.unsplash.com/photo-1640292343595-889db1c8262e?w=900&auto=format&fit=crop"
+  },
+  {
+    title: "Terracotta & Pottery",
+    desc: "Discover the earth's natural beauty shaped by masters",
+    image: "https://images.unsplash.com/photo-1590605095243-072811dbe64c?w=900&auto=format&fit=crop"
+  },
+  {
+    title: "Festive Melas",
+    desc: "Experience the vibrant colors and joy of Indian crafts",
+    image: "https://images.unsplash.com/photo-1605292356183-a77d0a9c9d1d?w=900&auto=format&fit=crop"
+  }
+];
+
+const jsonLd = {
+  "@context": "https://schema.org",
+  "@type": "Organization",
+  name: "Kaarigar Expo",
+  url: "https://kaarigarexpo.in",
+  logo: "https://kaarigarexpo.in/favicon.ico",
+  description:
+    "India's premier digital platform for artisan mela registration, handicraft exhibitions, and cultural event management.",
+  contactPoint: {
+    "@type": "ContactPoint",
+    telephone: "+91-80-4567-8901",
+    contactType: "Customer Support",
+    areaServed: "IN",
+    availableLanguage: ["English", "Hindi"],
+  },
+  sameAs: [],
+};
+
 export default function Home() {
   const [featuredEvents, setFeaturedEvents] = useState<EventType[]>([]);
   const [loadingEvents, setLoadingEvents] = useState(true);
+  const [currentSlide, setCurrentSlide] = useState(0);
+  const timerRef = useRef<ReturnType<typeof setInterval> | null>(null);
+
+  const nextSlide = () => setCurrentSlide((prev) => (prev + 1) % heroSlides.length);
+  const prevSlide = () => setCurrentSlide((prev) => (prev - 1 + heroSlides.length) % heroSlides.length);
+
+  // Auto-advance carousel every 5 seconds
+  const resetTimer = () => {
+    if (timerRef.current) clearInterval(timerRef.current);
+    timerRef.current = setInterval(nextSlide, 5000);
+  };
+
+  useEffect(() => {
+    resetTimer();
+    return () => { if (timerRef.current) clearInterval(timerRef.current); };
+  }, []);
 
   useEffect(() => {
     const fetchEvents = async () => {
@@ -32,9 +84,14 @@ export default function Home() {
 
   return (
     <div className="bg-[#F5EFE6] w-full">
+      {/* JSON-LD Structured Data */}
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
+      />
 
       {/* ── HERO ── */}
-      <section className="relative overflow-hidden bg-[#3D2B1F] earthy-texture">
+      <section aria-label="Hero carousel – Indian artisan crafts" className="relative overflow-hidden bg-[#3D2B1F] earthy-texture">
         <div className="absolute inset-0 pointer-events-none">
           <div className="absolute top-0 right-0 w-[600px] h-[600px] bg-[#C4602A] rounded-full opacity-10 blur-[120px] translate-x-1/3 -translate-y-1/3"></div>
           <div className="absolute bottom-0 left-0 w-[400px] h-[400px] bg-[#D4A96A] rounded-full opacity-10 blur-[100px] -translate-x-1/3 translate-y-1/3"></div>
@@ -69,28 +126,41 @@ export default function Home() {
           </div>
 
           <div className="lg:w-1/2 hidden md:block">
-            <div className="relative w-full h-[420px] rounded-3xl overflow-hidden border border-[#6B4C3B]/60 shadow-2xl">
+            <div className="relative w-full h-[420px] rounded-3xl overflow-hidden border border-[#6B4C3B]/60 shadow-2xl group">
               <img
-                src="https://images.unsplash.com/photo-1635205411959-a27e5f9bba33?w=900&auto=format&fit=crop"
-                alt="Artisan at mela stall"
-                className="w-full h-full object-cover"
-                onError={(e) => { e.currentTarget.src = "https://images.unsplash.com/photo-1583743814966-8936f5b7be1a?w=900&auto=format&fit=crop"; }}
+                key={heroSlides[currentSlide].image}
+                src={heroSlides[currentSlide].image}
+                alt={heroSlides[currentSlide].title}
+                className="w-full h-full object-cover transition-opacity duration-500 animate-in fade-in zoom-in-95"
               />
-              <div className="absolute inset-0 bg-gradient-to-t from-[#3D2B1F]/90 via-transparent to-transparent flex flex-col justify-end p-8">
-                <h3 className="text-2xl font-bold text-white mb-1">Heritage Weaves & Handloom</h3>
-                <p className="text-[#9C7B6A] text-sm">Authentic artisan textiles from across India</p>
+              <div className="absolute inset-0 bg-gradient-to-t from-[#3D2B1F] via-[#3D2B1F]/40 to-transparent flex flex-col justify-end p-8">
+                <h3 className="text-2xl font-bold text-white mb-1">{heroSlides[currentSlide].title}</h3>
+                <p className="text-[#9C7B6A] text-sm">{heroSlides[currentSlide].desc}</p>
                 <div className="flex items-center gap-2 mt-4">
-                  <div className="w-8 h-1 bg-[#C4602A] rounded-full"></div>
-                  <div className="w-2 h-1 bg-white/30 rounded-full"></div>
-                  <div className="w-2 h-1 bg-white/30 rounded-full"></div>
+                {heroSlides.map((_, i) => (
+                    <button
+                      key={i}
+                      onClick={() => { setCurrentSlide(i); resetTimer(); }}
+                      className={`h-1.5 rounded-full transition-all ${currentSlide === i ? "w-8 bg-[#C4602A]" : "w-2 bg-white/30 hover:bg-white/50"}`}
+                      aria-label={`Go to slide ${i + 1}: ${heroSlides[i].title}`}
+                    />
+                  ))}
                 </div>
               </div>
-              <div className="absolute top-1/2 -translate-y-1/2 left-4 w-9 h-9 rounded-full bg-[#3D2B1F]/60 backdrop-blur flex items-center justify-center text-white border border-white/10">
-                <ChevronLeft className="w-4 h-4" />
-              </div>
-              <div className="absolute top-1/2 -translate-y-1/2 right-4 w-9 h-9 rounded-full bg-[#3D2B1F]/60 backdrop-blur flex items-center justify-center text-white border border-white/10">
-                <ChevronRight className="w-4 h-4" />
-              </div>
+              <button 
+                onClick={() => { prevSlide(); resetTimer(); }}
+                className="absolute top-1/2 -translate-y-1/2 left-4 w-10 h-10 rounded-full bg-[#3D2B1F]/60 backdrop-blur flex items-center justify-center text-white border border-white/10 opacity-0 group-hover:opacity-100 hover:bg-[#C4602A] transition-all cursor-pointer z-20"
+                aria-label="Previous slide"
+              >
+                <ChevronLeft className="w-5 h-5" />
+              </button>
+              <button 
+                onClick={() => { nextSlide(); resetTimer(); }}
+                className="absolute top-1/2 -translate-y-1/2 right-4 w-10 h-10 rounded-full bg-[#3D2B1F]/60 backdrop-blur flex items-center justify-center text-white border border-white/10 opacity-0 group-hover:opacity-100 hover:bg-[#C4602A] transition-all cursor-pointer z-20"
+                aria-label="Next slide"
+              >
+                <ChevronRight className="w-5 h-5" />
+              </button>
             </div>
           </div>
         </div>

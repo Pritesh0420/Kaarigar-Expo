@@ -10,6 +10,14 @@ import Map from "@/components/Map";
 import { Calendar, MapPin, UserCheck, Star, Info } from "lucide-react";
 import toast from "react-hot-toast";
 
+const updatedBanners: Record<string, string> = {
+  "event-1": "https://images.unsplash.com/photo-1605292356183-a77d0a9c9d1d?w=1200&auto=format&fit=crop",
+  "event-2": "https://images.unsplash.com/photo-1590605095243-072811dbe64c?w=1200&auto=format&fit=crop",
+  "event-3": "https://images.unsplash.com/photo-1616706161242-f1d591350d1c?w=1200&auto=format&fit=crop",
+  "event-4": "https://images.unsplash.com/photo-1640292343595-889db1c8262e?w=1200&auto=format&fit=crop",
+  "event-5": "https://images.unsplash.com/photo-1603030002297-85e206a2285a?w=1200&auto=format&fit=crop",
+};
+
 interface Artisan {
   id: string;
   kaarigarName: string;
@@ -123,12 +131,14 @@ export default function EventDetails() {
   if (loading) return <div className="p-20 text-center text-slate-500 text-lg">Loading Event...</div>;
   if (!event) return <div className="p-20 text-center text-slate-500 text-lg">Event not found.</div>;
 
+  const banner = updatedBanners[event.id] || event.bannerUrl;
+
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
       {/* Banner */}
       <div className="relative h-64 sm:h-96 w-full rounded-2xl overflow-hidden mb-8 shadow-md">
         <img 
-          src={event.bannerUrl} 
+          src={banner} 
           alt={event.title} 
           onError={(e) => { e.currentTarget.src = `https://picsum.photos/seed/${event.id}/1200/600`; }}
           className="w-full h-full object-cover" 

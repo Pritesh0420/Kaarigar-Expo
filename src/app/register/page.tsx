@@ -25,6 +25,17 @@ export default function Register() {
   const [showPw,   setShowPw]   = useState(false);
   const [showCf,   setShowCf]   = useState(false);
   const [loading,  setLoading]  = useState(false);
+  
+  // Kaarigar specific
+  const [city, setCity] = useState("");
+  const [state, setState] = useState("");
+  const [craftType, setCraftType] = useState("");
+  const [bio, setBio] = useState("");
+  const [photoUrl, setPhotoUrl] = useState("");
+  
+  // Visitor specific
+  const [interests, setInterests] = useState("");
+
   const router = useRouter();
 
   const handleRegister = async (e: React.FormEvent) => {
@@ -34,16 +45,31 @@ export default function Register() {
     setLoading(true);
     try {
       const uc = await createUserWithEmailAndPassword(auth, email, password);
-      await setDoc(doc(db, "users", uc.user.uid), {
+      const payload: any = {
         uid: uc.user.uid,
         email,
         role,
         displayName: name,
         phone,
         createdAt: new Date().toISOString(),
-      });
+      };
+      
+      if (role === "kaarigar") {
+        payload.city = city;
+        payload.state = state;
+        payload.craftType = craftType;
+        payload.bio = bio;
+        payload.photoUrl = photoUrl;
+      } else if (role === "visitor") {
+        payload.interests = interests;
+      }
+      
+      await setDoc(doc(db, "users", uc.user.uid), payload);
       toast.success("Account created! Welcome to Kaarigar Expo 🎉");
-      router.push("/");
+      
+      if (role === "admin") router.push("/admin/dashboard");
+      else if (role === "kaarigar") router.push("/kaarigar/dashboard");
+      else router.push("/visitor/my-rsvps");
     } catch (err: any) {
       toast.error(err.message || "Registration failed");
     } finally {
@@ -163,6 +189,81 @@ export default function Register() {
                   />
                 </div>
               </div>
+
+              {role === "kaarigar" && (
+                <>
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    <div>
+                      <label className="block text-sm font-bold text-[#0B3020] mb-2">City <span className="text-[#B5541B]">*</span></label>
+                      <input
+                        type="text"
+                        required
+                        placeholder="e.g. Jaipur"
+                        value={city}
+                        onChange={(e) => setCity(e.target.value)}
+                        className="w-full px-4 py-3 rounded-xl border border-[#C8E6D4] bg-[#F4FAF6] focus:ring-2 focus:ring-[#1A6B45] focus:border-[#1A6B45] outline-none text-[#0B3020] placeholder:text-[#A0C4B2] transition-all"
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-sm font-bold text-[#0B3020] mb-2">State <span className="text-[#B5541B]">*</span></label>
+                      <input
+                        type="text"
+                        required
+                        placeholder="e.g. Rajasthan"
+                        value={state}
+                        onChange={(e) => setState(e.target.value)}
+                        className="w-full px-4 py-3 rounded-xl border border-[#C8E6D4] bg-[#F4FAF6] focus:ring-2 focus:ring-[#1A6B45] focus:border-[#1A6B45] outline-none text-[#0B3020] placeholder:text-[#A0C4B2] transition-all"
+                      />
+                    </div>
+                  </div>
+                  <div>
+                    <label className="block text-sm font-bold text-[#0B3020] mb-2">Primary Craft Specialization <span className="text-[#B5541B]">*</span></label>
+                    <input
+                      type="text"
+                      required
+                      placeholder="e.g. Handloom & Weaving"
+                      value={craftType}
+                      onChange={(e) => setCraftType(e.target.value)}
+                      className="w-full px-4 py-3 rounded-xl border border-[#C8E6D4] bg-[#F4FAF6] focus:ring-2 focus:ring-[#1A6B45] focus:border-[#1A6B45] outline-none text-[#0B3020] placeholder:text-[#A0C4B2] transition-all"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-sm font-bold text-[#0B3020] mb-2">Artisan Bio & Craft Heritage Description <span className="text-[#B5541B]">*</span></label>
+                    <textarea
+                      required
+                      rows={3}
+                      placeholder="Describe your craft lineage, traditional techniques..."
+                      value={bio}
+                      onChange={(e) => setBio(e.target.value)}
+                      className="w-full px-4 py-3 rounded-xl border border-[#C8E6D4] bg-[#F4FAF6] focus:ring-2 focus:ring-[#1A6B45] focus:border-[#1A6B45] outline-none text-[#0B3020] placeholder:text-[#A0C4B2] transition-all resize-none"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-sm font-bold text-[#0B3020] mb-2">Banner / Profile Image URL <span className="text-[#A0C4B2] font-normal">(Optional)</span></label>
+                    <input
+                      type="url"
+                      placeholder="https://images.unsplash.com/photo-..."
+                      value={photoUrl}
+                      onChange={(e) => setPhotoUrl(e.target.value)}
+                      className="w-full px-4 py-3 rounded-xl border border-[#C8E6D4] bg-[#F4FAF6] focus:ring-2 focus:ring-[#1A6B45] focus:border-[#1A6B45] outline-none text-[#0B3020] placeholder:text-[#A0C4B2] transition-all"
+                    />
+                  </div>
+                </>
+              )}
+
+              {role === "visitor" && (
+                <div>
+                  <label className="block text-sm font-bold text-[#0B3020] mb-2">Areas of Interest <span className="text-[#B5541B]">*</span></label>
+                  <input
+                    type="text"
+                    required
+                    placeholder="e.g. Pottery, Handloom, Tribal Art"
+                    value={interests}
+                    onChange={(e) => setInterests(e.target.value)}
+                    className="w-full px-4 py-3 rounded-xl border border-[#C8E6D4] bg-[#F4FAF6] focus:ring-2 focus:ring-[#1A6B45] focus:border-[#1A6B45] outline-none text-[#0B3020] placeholder:text-[#A0C4B2] transition-all"
+                  />
+                </div>
+              )}
 
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div>

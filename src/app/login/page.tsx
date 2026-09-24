@@ -3,7 +3,7 @@
 import { useState } from "react";
 import { signInWithEmailAndPassword, createUserWithEmailAndPassword } from "firebase/auth";
 import { auth, db } from "@/lib/firebase";
-import { doc, setDoc } from "firebase/firestore";
+import { doc, setDoc, getDoc } from "firebase/firestore";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import toast from "react-hot-toast";
@@ -27,9 +27,13 @@ export default function Login() {
     e.preventDefault();
     setLoading(true);
     try {
-      await signInWithEmailAndPassword(auth, email, password);
+      const cred = await signInWithEmailAndPassword(auth, email, password);
+      const userDoc = await getDoc(doc(db, "users", cred.user.uid));
+      const userRole = userDoc.data()?.role || "visitor";
       toast.success("Welcome back!");
-      router.push("/");
+      if (userRole === "admin") router.push("/admin/dashboard");
+      else if (userRole === "kaarigar") router.push("/kaarigar/dashboard");
+      else router.push("/visitor/my-rsvps");
     } catch (err: any) {
       toast.error(err.message || "Failed to sign in");
     } finally {
@@ -61,7 +65,9 @@ export default function Login() {
         } else throw err;
       }
       toast.success(`Signed in as ${roleId}!`);
-      router.push("/");
+      if (roleId === "admin") router.push("/admin/dashboard");
+      else if (roleId === "kaarigar") router.push("/kaarigar/dashboard");
+      else router.push("/visitor/my-rsvps");
     } catch (err: any) {
       toast.error("Quick login failed: " + err.message);
     } finally {
@@ -77,7 +83,7 @@ export default function Login() {
       {/* ── LEFT PANEL — craft photo backdrop ── */}
       <div className="hidden lg:flex lg:w-1/2 relative overflow-hidden">
         <img
-          src="https://images.unsplash.com/photo-1635205411959-a27e5f9bba33?w=900&auto=format&fit=crop"
+          src="https://images.unsplash.com/photo-1605292356183-a77d0a9c9d1d?w=900&auto=format&fit=crop"
           alt="Artisan at a mela stall"
           className="absolute inset-0 w-full h-full object-cover"
         />
@@ -88,18 +94,6 @@ export default function Login() {
               "Every thread tells a story of <span className="text-[#E8A45C]">heritage</span>."
             </p>
             <p className="text-sm text-white/70">— Kaarigar Expo, 2026</p>
-          </div>
-          <div className="flex gap-3">
-            <div className="w-10 h-10 rounded-full border-2 border-[#E8A45C] overflow-hidden bg-[#3D2B1F]">
-              <img src="https://ui-avatars.com/api/?name=Radhe&background=C4602A&color=fff&size=80" alt="" className="w-full h-full object-cover" />
-            </div>
-            <div className="w-10 h-10 rounded-full border-2 border-white/30 overflow-hidden bg-[#3D2B1F] -ml-2">
-              <img src="https://ui-avatars.com/api/?name=Komal&background=5B35A0&color=fff&size=80" alt="" className="w-full h-full object-cover" />
-            </div>
-            <div className="w-10 h-10 rounded-full border-2 border-white/30 overflow-hidden bg-[#3D2B1F] -ml-2">
-              <img src="https://ui-avatars.com/api/?name=Sameer&background=1A6B45&color=fff&size=80" alt="" className="w-full h-full object-cover" />
-            </div>
-            <p className="text-sm text-white/70 ml-2 self-center">1,200+ artisans registered</p>
           </div>
         </div>
       </div>
