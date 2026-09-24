@@ -1,0 +1,48 @@
+rules_version = '2';
+
+service cloud.firestore {
+  match /databases/{database}/documents {
+  
+    // Helper functions
+    function isSignedIn() {
+      return request.auth != null;
+    }
+    function isAdmin() {
+      return isSignedIn() && get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role == 'admin';
+    }
+    
+    // Users Collection
+    match /users/{userId} {
+      // Anyone can read profiles to see Kaarigar names, etc.
+      allow read: if true;
+      // User can write their own profile, admins can write any
+      allow write: if (isSignedIn() && request.auth.uid == userId) || isAdmin();
+    }
+    
+    // Events Collection
+    match /events/{eventId} {
+      // Anyone can read events
+      allow read: if true;
+      // Only admins can create/update events
+      allow write: if isAdmin();
+    }
+    
+    // Applications Collection (Kaarigar applying to Events)
+    match /applications/{appId} {
+      // Anyone can read (so visitors can see approved kaarigars on event pages)
+      allow read: if true;
+      // Kaarigars can apply (create), Admins can update status (write)
+      allow create: if isSignedIn();
+      allow update, delete: if isAdmin() || (isSignedIn() && request.auth.uid == resource.data.kaarigarId);
+    }
+    
+    // RSVPs Collection
+    match /rsvps/{rsvpId} {
+      // Admins can read all RSVPs. Users can read their own.
+      allow read: if isAdmin() || (isSignedIn() && request.auth.uid == resource.data.visitorId);
+      // Visitors can create RSVPs
+      allow create: if isSignedIn();
+      allow update, delete: if isAdmin() || (isSignedIn() && request.auth.uid == resource.data.visitorId);
+    }
+  }
+}
