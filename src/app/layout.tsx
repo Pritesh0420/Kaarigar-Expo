@@ -23,7 +23,7 @@ export default function RootLayout({
       <body className={inter.className}>
         <AuthProvider>
           <Navbar />
-          <main className="min-h-screen bg-[#fbf9f4] text-slate-900">
+          <main className="min-h-screen bg-[#F5EFE6] text-[#3D2B1F]">
             {children}
           </main>
           <Footer />

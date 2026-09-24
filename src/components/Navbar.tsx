@@ -5,7 +5,7 @@ import { useAuth } from "@/contexts/AuthContext";
 import { auth } from "@/lib/firebase";
 import { signOut } from "firebase/auth";
 import toast from "react-hot-toast";
-import { LogIn, UserPlus, UserCircle, LogOut } from "lucide-react";
+import { LogIn, UserPlus, LogOut, Flame } from "lucide-react";
 
 export default function Navbar() {
   const { userProfile, loading } = useAuth();
@@ -14,64 +14,87 @@ export default function Navbar() {
     try {
       await signOut(auth);
       toast.success("Logged out successfully");
-    } catch (error) {
+    } catch {
       toast.error("Error logging out");
     }
   };
 
   return (
-    <nav className="bg-white border-b border-slate-200 px-4 py-4 sticky top-0 z-50">
-      <div className="max-w-7xl mx-auto flex items-center justify-between">
-        <Link href="/" className="flex items-center gap-2">
-          <span className="text-2xl font-extrabold text-[#192742] tracking-tight">
+    <nav className="bg-[#3D2B1F] border-b border-[#6B4C3B]/30 px-4 py-0 sticky top-0 z-50 shadow-md">
+      <div className="max-w-7xl mx-auto flex items-center justify-between h-16">
+
+        {/* Logo */}
+        <Link href="/" className="flex items-center gap-2.5">
+          <div className="w-8 h-8 bg-[#C4602A] rounded-lg flex items-center justify-center">
+            <Flame className="w-4 h-4 text-white" />
+          </div>
+          <span className="text-xl font-extrabold text-[#F5EFE6] tracking-tight">
             Kaarigar Expo
           </span>
-          <span className="bg-[#ddaf56] text-white text-[10px] font-bold px-2 py-0.5 rounded-sm uppercase tracking-wider">
+          <span className="bg-[#C4602A] text-white text-[9px] font-bold px-2 py-0.5 rounded uppercase tracking-widest">
             Mela
           </span>
         </Link>
 
-        <div className="hidden md:flex items-center gap-8 text-sm font-semibold text-[#192742]">
-          <Link href="/" className="hover:text-[#ddaf56] transition-colors pb-1 border-b-2 border-transparent hover:border-[#ddaf56]">Home</Link>
-          <Link href="/events" className="hover:text-[#ddaf56] transition-colors pb-1 border-b-2 border-transparent hover:border-[#ddaf56]">Upcoming Melas</Link>
-          <Link href="/kaarigars" className="hover:text-[#ddaf56] transition-colors pb-1 border-b-2 border-transparent hover:border-[#ddaf56]">Kaarigars</Link>
-          <Link href="/about" className="hover:text-[#ddaf56] transition-colors pb-1 border-b-2 border-transparent hover:border-[#ddaf56]">About</Link>
-          <Link href="/contact" className="hover:text-[#ddaf56] transition-colors pb-1 border-b-2 border-transparent hover:border-[#ddaf56]">Contact</Link>
+        {/* Nav Links */}
+        <div className="hidden md:flex items-center gap-1 text-sm font-semibold">
+          {[
+            { href: "/", label: "Home" },
+            { href: "/events", label: "Upcoming Melas" },
+            { href: "/kaarigars", label: "Kaarigars" },
+            { href: "/about", label: "About" },
+            { href: "/contact", label: "Contact" },
+          ].map(({ href, label }) => (
+            <Link
+              key={href}
+              href={href}
+              className="px-4 py-1.5 rounded-lg text-[#EAE0CF] hover:text-white hover:bg-[#6B4C3B]/40 transition-colors"
+            >
+              {label}
+            </Link>
+          ))}
         </div>
 
-        <div className="flex items-center gap-4 text-sm font-medium">
+        {/* Auth buttons */}
+        <div className="flex items-center gap-3 text-sm font-medium">
           {!loading && (
             <>
               {userProfile ? (
-                <div className="flex items-center gap-4">
+                <div className="flex items-center gap-3">
                   {userProfile.role === "admin" && (
-                    <Link href="/admin/dashboard" className="text-[#192742] hover:text-[#ddaf56] font-semibold">Admin</Link>
+                    <Link href="/admin/dashboard" className="text-[#D4A96A] hover:text-white font-semibold transition-colors">
+                      Admin Panel
+                    </Link>
                   )}
                   {userProfile.role === "kaarigar" && (
-                    <Link href="/kaarigar/dashboard" className="text-[#192742] hover:text-[#ddaf56] font-semibold">Dashboard</Link>
+                    <Link href="/kaarigar/dashboard" className="text-[#D4A96A] hover:text-white font-semibold transition-colors">
+                      Dashboard
+                    </Link>
                   )}
                   {userProfile.role === "visitor" && (
-                    <Link href="/visitor/my-rsvps" className="text-[#192742] hover:text-[#ddaf56] font-semibold">My RSVPs</Link>
+                    <Link href="/visitor/my-rsvps" className="text-[#D4A96A] hover:text-white font-semibold transition-colors">
+                      My RSVPs
+                    </Link>
                   )}
-                  <button 
+                  <button
                     onClick={handleLogout}
-                    className="flex items-center gap-2 text-slate-500 hover:text-red-600 transition-colors"
+                    className="flex items-center gap-1.5 text-[#9C7B6A] hover:text-red-400 transition-colors"
                   >
                     <LogOut className="w-4 h-4" />
                     <span className="hidden sm:inline">Logout</span>
                   </button>
                 </div>
               ) : (
-                <div className="flex items-center gap-3">
-                  <Link 
-                    href="/login" 
-                    className="flex items-center gap-2 border-2 border-[#192742] text-[#192742] px-4 py-2 rounded font-semibold hover:bg-[#192742] hover:text-white transition-colors"
+                <div className="flex items-center gap-2">
+                  <Link
+                    href="/login"
+                    className="flex items-center gap-1.5 border border-[#9C7B6A] text-[#EAE0CF] px-4 py-2 rounded-lg font-semibold hover:bg-[#6B4C3B]/40 hover:border-[#D4A96A] transition-all"
                   >
                     <LogIn className="w-4 h-4" /> Login
                   </Link>
-                  <Link 
-                    href="/register" 
-                    className="flex items-center gap-2 bg-[#192742] text-white px-4 py-2 rounded font-semibold hover:bg-[#111a2e] transition-colors shadow-sm"
+                  <Link
+                    href="/register"
+                    className="flex items-center gap-1.5 bg-[#C4602A] hover:bg-[#9E4B1F] text-white px-4 py-2 rounded-lg font-semibold transition-all shadow-sm"
                   >
                     <UserPlus className="w-4 h-4" /> Register
                   </Link>

@@ -1,5 +1,7 @@
+"use client";
+
 import Link from "next/link";
-import { Calendar, MapPin, Users } from "lucide-react";
+import { Calendar, MapPin, Users, ArrowRight } from "lucide-react";
 
 export interface EventType {
   id: string;
@@ -14,55 +16,72 @@ export interface EventType {
   coordinates?: { lat: number; lng: number };
 }
 
+const statusColors: Record<string, string> = {
+  upcoming: "bg-[#EAE0CF] text-[#6B4C3B] border-[#D4A96A]",
+  active:   "bg-[#C4602A] text-white border-[#C4602A]",
+  ongoing:  "bg-[#C4602A] text-white border-[#C4602A]",
+  past:     "bg-[#9C7B6A]/20 text-[#9C7B6A] border-[#9C7B6A]",
+};
+
 export default function EventCard({ event }: { event: EventType }) {
-  const start = new Date(event.startDate).toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' });
-  
+  const start = new Date(event.startDate).toLocaleDateString("en-GB", {
+    day: "numeric", month: "short", year: "numeric",
+  });
+
+  const statusClass = statusColors[event.status] || statusColors.upcoming;
+
   return (
-    <div className="bg-white rounded-xl shadow-sm border border-[#e8e2d2] overflow-hidden hover:shadow-md transition-shadow group flex flex-col">
-      <div className="h-48 overflow-hidden bg-[#e8e2d2] relative">
-        <img 
-          src={event.bannerUrl} 
+    <div className="bg-white rounded-2xl shadow-sm border border-[#EAE0CF] overflow-hidden hover:shadow-lg transition-all duration-300 group flex flex-col">
+      {/* Banner */}
+      <div className="h-52 overflow-hidden bg-[#EAE0CF] relative">
+        <img
+          src={event.bannerUrl}
           alt={event.title}
           onError={(e) => { e.currentTarget.src = `https://picsum.photos/seed/${event.id}/800/400`; }}
           className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
         />
-        <div className="absolute top-3 right-3 bg-white/90 backdrop-blur px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wider text-[#192742] shadow-sm flex items-center gap-1.5">
-          <Calendar className="w-3 h-3 text-[#ddaf56]" /> {event.status}
+        {/* Status badge */}
+        <div className={`absolute top-3 right-3 px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wider border backdrop-blur-sm ${statusClass}`}>
+          <span className="flex items-center gap-1.5">
+            <Calendar className="w-3 h-3" /> {event.status}
+          </span>
         </div>
       </div>
-      
-      <div className="p-6 flex-1 flex flex-col">
-        <h3 className="text-xl font-bold text-[#192742] mb-3 line-clamp-2 leading-tight">{event.title}</h3>
-        
-        <div className="space-y-2.5 mb-5">
-          <div className="flex items-center text-sm text-slate-500">
-            <Calendar className="w-4 h-4 mr-2 text-[#ddaf56] shrink-0" />
-            <span>{start} • 10:00</span>
+
+      {/* Content */}
+      <div className="p-5 flex-1 flex flex-col">
+        <h3 className="text-lg font-bold text-[#3D2B1F] mb-3 line-clamp-2 leading-snug">{event.title}</h3>
+
+        <div className="space-y-2 mb-4">
+          <div className="flex items-center text-sm text-[#6B4C3B]">
+            <Calendar className="w-4 h-4 mr-2 text-[#C4602A] shrink-0" />
+            <span>{start}</span>
           </div>
-          <div className="flex text-sm text-slate-500">
-            <MapPin className="w-4 h-4 mr-2 text-[#ddaf56] shrink-0 mt-0.5" />
-            <span className="line-clamp-2">{event.locationName}, {event.city}</span>
+          <div className="flex items-start text-sm text-[#6B4C3B]">
+            <MapPin className="w-4 h-4 mr-2 text-[#C4602A] shrink-0 mt-0.5" />
+            <span className="line-clamp-1">{event.locationName}, {event.city}</span>
           </div>
-          <div className="flex items-center text-sm font-semibold text-[#192742]">
-            <Users className="w-4 h-4 mr-2 text-[#ddaf56] shrink-0" />
+          <div className="flex items-center text-sm text-[#6B4C3B] font-medium">
+            <Users className="w-4 h-4 mr-2 text-[#C4602A] shrink-0" />
             <span>Artisan registration open</span>
           </div>
         </div>
-        
-        <p className="text-slate-600 text-sm mb-6 line-clamp-2 leading-relaxed flex-1">{event.description}</p>
-        
-        <div className="mt-auto flex gap-3">
-          <Link 
+
+        <p className="text-sm text-[#9C7B6A] mb-5 line-clamp-2 leading-relaxed flex-1">{event.description}</p>
+
+        {/* CTA Buttons */}
+        <div className="mt-auto flex gap-2.5">
+          <Link
             href={`/events/${event.id}`}
-            className="flex-1 text-center border-2 border-[#192742] hover:bg-[#192742] hover:text-white text-[#192742] font-bold py-2.5 rounded-lg transition-colors text-xs uppercase tracking-wider"
+            className="flex-1 text-center border-2 border-[#3D2B1F] text-[#3D2B1F] hover:bg-[#3D2B1F] hover:text-white font-semibold py-2.5 rounded-xl transition-colors text-xs uppercase tracking-wider"
           >
             View Details
           </Link>
-          <Link 
+          <Link
             href={`/events/${event.id}`}
-            className="flex-1 text-center bg-[#ddaf56] hover:bg-[#c99a41] text-[#192742] font-bold py-2.5 rounded-lg transition-colors text-xs uppercase tracking-wider flex items-center justify-center gap-1"
+            className="flex-1 text-center bg-[#C4602A] hover:bg-[#9E4B1F] text-white font-semibold py-2.5 rounded-xl transition-colors text-xs uppercase tracking-wider flex items-center justify-center gap-1"
           >
-            RSVP Pass <span>→</span>
+            RSVP Pass <ArrowRight className="w-3.5 h-3.5" />
           </Link>
         </div>
       </div>
