@@ -4,6 +4,7 @@ import "./globals.css";
 import { AuthProvider } from "@/contexts/AuthContext";
 import { Toaster } from "react-hot-toast";
 import Navbar from "@/components/Navbar";
+import Footer from "@/components/Footer";
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -22,9 +23,10 @@ export default function RootLayout({
       <body className={inter.className}>
         <AuthProvider>
           <Navbar />
-          <main className="min-h-screen bg-slate-50 text-slate-900 pb-12">
+          <main className="min-h-screen bg-[#fbf9f4] text-slate-900">
             {children}
           </main>
+          <Footer />
           <Toaster position="bottom-right" />
         </AuthProvider>
       </body>

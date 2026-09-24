@@ -1,24 +1,25 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useEffect, useState } from "react";
 import { collection, getDocs, query, orderBy } from "firebase/firestore";
 import { db } from "@/lib/firebase";
 import EventCard, { EventType } from "@/components/EventCard";
-import { Search, MapPin } from "lucide-react";
+import { Search, Filter } from "lucide-react";
 
-export default function EventsCatalog() {
+export default function EventsPage() {
   const [events, setEvents] = useState<EventType[]>([]);
   const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState("");
-  const [cityFilter, setCityFilter] = useState("");
+  const [cityFilter, setCityFilter] = useState("All Cities");
+  const [statusFilter, setStatusFilter] = useState("Active (Live & Upcoming)");
 
   useEffect(() => {
     const fetchEvents = async () => {
       try {
-        const q = query(collection(db, "events"), orderBy("startDate", "desc"));
-        const snapshot = await getDocs(q);
-        const evts = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() } as EventType));
-        setEvents(evts);
+        const q = query(collection(db, "events"), orderBy("startDate", "asc"));
+        const snap = await getDocs(q);
+        const data = snap.docs.map((doc) => doc.data() as EventType);
+        setEvents(data);
       } catch (error) {
         console.error("Error fetching events:", error);
       } finally {
@@ -28,71 +29,128 @@ export default function EventsCatalog() {
     fetchEvents();
   }, []);
 
-  const cities = Array.from(new Set(events.map(e => e.city))).sort();
+  const cities = ["All Cities", ...Array.from(new Set(events.map((e) => e.city)))];
 
-  const filteredEvents = events.filter(e => {
-    const matchesSearch = e.title.toLowerCase().includes(searchTerm.toLowerCase()) || 
-                          e.description.toLowerCase().includes(searchTerm.toLowerCase());
-    const matchesCity = cityFilter === "" || e.city === cityFilter;
-    return matchesSearch && matchesCity;
+  const filteredEvents = events.filter((e) => {
+    const matchesSearch = 
+      e.title.toLowerCase().includes(searchTerm.toLowerCase()) || 
+      e.city.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      e.description.toLowerCase().includes(searchTerm.toLowerCase());
+      
+    const matchesCity = cityFilter === "All Cities" || e.city === cityFilter;
+    
+    let matchesStatus = true;
+    if (statusFilter === "Active (Live & Upcoming)") {
+      matchesStatus = e.status === "active" || e.status === "upcoming";
+    } else if (statusFilter === "Live Now") {
+      matchesStatus = e.status === "active";
+    } else if (statusFilter === "Upcoming") {
+      matchesStatus = e.status === "upcoming";
+    } else if (statusFilter === "Past / Concluded") {
+      matchesStatus = e.status === "past";
+    }
+    
+    return matchesSearch && matchesCity && matchesStatus;
   });
 
   return (
-    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
-      <div className="text-center mb-12">
-        <h1 className="text-4xl font-extrabold text-slate-900 tracking-tight mb-4">Discover Melas</h1>
-        <p className="text-lg text-slate-600 max-w-2xl mx-auto">Find the best artisan exhibitions, fairs, and melas happening near you.</p>
-      </div>
+    <div className="bg-[#fbf9f4] min-h-screen pb-20">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-16">
+        
+        {/* Header */}
+        <div className="mb-12">
+          <p className="text-xs font-bold text-[#ddaf56] uppercase tracking-widest mb-2">Exhibition Schedule</p>
+          <h1 className="text-4xl md:text-5xl font-extrabold text-[#192742] tracking-tight mb-4">
+            Upcoming Melas & Exhibitions
+          </h1>
+          <p className="text-lg text-slate-600 max-w-2xl">
+            Explore vibrant handicraft melas, master weaver showcases, and traditional art expos happening across India.
+          </p>
+        </div>
 
-      {/* Filters */}
-      <div className="bg-white p-4 rounded-xl shadow-sm border border-slate-200 flex flex-col md:flex-row gap-4 mb-10">
-        <div className="flex-1 relative">
-          <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-400" />
-          <input 
-            type="text" 
-            placeholder="Search events..." 
-            className="w-full pl-10 pr-4 py-3 bg-slate-50 border-none rounded-lg focus:ring-2 focus:ring-orange-500 outline-none"
-            value={searchTerm}
-            onChange={(e) => setSearchTerm(e.target.value)}
-          />
-        </div>
-        <div className="w-full md:w-64 relative">
-          <MapPin className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-400" />
-          <select 
-            className="w-full pl-10 pr-10 py-3 bg-slate-50 border-none rounded-lg focus:ring-2 focus:ring-orange-500 outline-none appearance-none"
-            value={cityFilter}
-            onChange={(e) => setCityFilter(e.target.value)}
-          >
-            <option value="">All Cities</option>
-            {cities.map(city => (
-              <option key={city} value={city}>{city}</option>
-            ))}
-          </select>
-        </div>
-      </div>
-
-      {/* Grid */}
-      {loading ? (
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-          {[1, 2, 3, 4, 5, 6].map(i => (
-            <div key={i} className="bg-slate-200 animate-pulse h-96 rounded-xl"></div>
-          ))}
-        </div>
-      ) : filteredEvents.length > 0 ? (
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-          {filteredEvents.map(event => (
-            <EventCard key={event.id} event={event} />
-          ))}
-        </div>
-      ) : (
-        <div className="text-center py-20 bg-white rounded-xl border border-slate-200">
-          <div className="bg-slate-50 w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4">
-            <Search className="w-8 h-8 text-slate-400" />
+        {/* Filters */}
+        <div className="bg-white rounded-2xl p-6 shadow-sm border border-[#e8e2d2] mb-12">
+          <div className="relative mb-6">
+            <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-400" />
+            <input 
+              type="text" 
+              placeholder="Search melas by title, city, or craft..." 
+              className="w-full pl-12 pr-4 py-4 bg-slate-50 border border-transparent rounded-xl focus:ring-2 focus:ring-[#192742] focus:border-[#192742] outline-none text-slate-700 font-medium transition-all"
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+            />
           </div>
-          <h3 className="text-xl font-bold text-slate-900 mb-2">No events found</h3>
-          <p className="text-slate-500">Try adjusting your search or city filter.</p>
+          
+          {/* Status Filters */}
+          <div className="flex items-center gap-3 overflow-x-auto pb-4 scrollbar-hide mb-2">
+            <span className="text-sm font-bold text-slate-700 mr-2 shrink-0">Event Timeline:</span>
+            {["Active (Live & Upcoming)", "Live Now", "Upcoming", "Past / Concluded", "All Melas"].map((status) => {
+              // Quick count calculation
+              let count = events.length;
+              if (status === "Active (Live & Upcoming)") count = events.filter(e => e.status === "active" || e.status === "upcoming").length;
+              if (status === "Live Now") count = events.filter(e => e.status === "active").length;
+              if (status === "Upcoming") count = events.filter(e => e.status === "upcoming").length;
+              if (status === "Past / Concluded") count = events.filter(e => e.status === "past").length;
+
+              return (
+                <button
+                  key={status}
+                  onClick={() => setStatusFilter(status)}
+                  className={`flex items-center gap-1.5 px-4 py-2 rounded-full text-sm font-semibold whitespace-nowrap transition-colors border ${
+                    statusFilter === status
+                      ? "bg-[#192742] text-white border-[#192742]"
+                      : "bg-white text-slate-600 border-slate-300 hover:border-[#192742]"
+                  }`}
+                >
+                  {status} <span className={statusFilter === status ? "text-slate-300" : "text-slate-400"}>({count})</span>
+                </button>
+              );
+            })}
+          </div>
+
+          {/* City Filters */}
+          <div className="flex items-center gap-3 overflow-x-auto pb-2 scrollbar-hide">
+            <span className="text-sm font-bold text-slate-700 mr-2 shrink-0 flex items-center gap-1.5">
+              <Filter className="w-4 h-4" /> Filter City:
+            </span>
+            {cities.map((city) => {
+              const count = city === "All Cities" ? events.length : events.filter(e => e.city === city).length;
+              return (
+                <button
+                  key={city}
+                  onClick={() => setCityFilter(city)}
+                  className={`flex items-center gap-1.5 px-4 py-1.5 rounded-full text-sm font-semibold whitespace-nowrap transition-colors border ${
+                    cityFilter === city
+                      ? "bg-[#192742] text-white border-[#192742]"
+                      : "bg-white text-slate-600 border-slate-300 hover:border-[#192742]"
+                  }`}
+                >
+                  {city} <span className={cityFilter === city ? "text-slate-300 text-xs" : "text-slate-400 text-xs"}>({count})</span>
+                </button>
+              )
+            })}
+          </div>
         </div>
-      )}
+
+        {/* Results */}
+        {loading ? (
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+            {[1, 2, 3, 4, 5, 6].map(i => (
+              <div key={i} className="bg-white rounded-xl shadow-sm border border-[#e8e2d2] h-96 animate-pulse"></div>
+            ))}
+          </div>
+        ) : filteredEvents.length > 0 ? (
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+            {filteredEvents.map((event) => (
+              <EventCard key={event.id} event={event} />
+            ))}
+          </div>
+        ) : (
+          <div className="text-center py-20 bg-white rounded-2xl border border-[#e8e2d2]">
+            <p className="text-slate-500 text-lg">No events found matching your criteria.</p>
+          </div>
+        )}
+      </div>
     </div>
   );
 }
