@@ -237,9 +237,19 @@ export default function EventDetails() {
             ) : null}
           </div>
 
-          <div className="bg-white p-4 rounded-2xl shadow-sm border border-slate-100 h-64">
-             {/* Map Component */}
-             <Map center={event.coordinates || { lat: 28.6139, lng: 77.2090 }} />
+          <div className="bg-white p-4 rounded-2xl shadow-sm border border-slate-100 flex flex-col gap-3">
+             <div className="h-64 rounded-xl overflow-hidden relative z-0">
+               <Map center={event.coordinates || { lat: 28.6139, lng: 77.2090 }} />
+             </div>
+             <a
+               href={`https://www.google.com/maps/search/?api=1&query=${event.coordinates?.lat || 28.6139},${event.coordinates?.lng || 77.2090}`}
+               target="_blank"
+               rel="noopener noreferrer"
+               className="w-full flex justify-center items-center gap-2 bg-[#F5EFE6] hover:bg-[#EAE0CF] text-[#3D2B1F] border border-[#EAE0CF] font-bold py-2.5 rounded-xl transition-colors text-sm"
+             >
+               <MapPin className="w-4 h-4 text-[#C4602A]" />
+               Open on Google Maps
+             </a>
           </div>
         </div>
       </div>

@@ -76,6 +76,17 @@ export default function Navbar() {
                       My RSVPs
                     </Link>
                   )}
+                  
+                  {/* Display User Name */}
+                  <div className="hidden sm:flex items-center gap-2 pl-3 border-l border-[#6B4C3B]/50 ml-1">
+                    <div className="w-6 h-6 rounded-full bg-[#C4602A] text-white flex items-center justify-center text-xs font-bold">
+                      {(userProfile.displayName || "U").charAt(0).toUpperCase()}
+                    </div>
+                    <span className="text-[#F5EFE6] text-sm font-medium mr-2">
+                      {userProfile.displayName || "User"}
+                    </span>
+                  </div>
+
                   <button
                     onClick={handleLogout}
                     className="flex items-center gap-1.5 text-[#9C7B6A] hover:text-red-400 transition-colors"
